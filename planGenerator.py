@@ -2,22 +2,34 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
+import csv
 
-file_path = "Data\\final_dataset_BFP_numbers_only.csv"
+trainingDataFilePath = "Data\\final_dataset_BFP_numbers_only.csv"
 
-#Reading csv
-df = pd.read_csv(file_path)
+userProfileDataPath = "Data\\ProjectData.csv"
 
-#Preparing Data
-x = df.drop('Exercise Recommendation Plan', axis=1)
-y = df['Exercise Recommendation Plan']
 
-x_train = x.iloc[:4500]
-x_test = x.iloc[4500:]
 
-y_train = y.iloc[:4500]
-y_test = y.iloc[4500:]
 
+#Reading csv for test user profiles
+UPdf = pd.read_csv(userProfileDataPath)
+
+#Reading csv for training data
+TDdf = pd.read_csv(trainingDataFilePath)
+
+#Preparing Data for training
+TDx = TDdf.drop('Exercise Recommendation Plan', axis=1)
+TDy = TDdf['Exercise Recommendation Plan']
+
+x_train = TDx.iloc[:4500]
+x_test = TDx.iloc[4500:]
+
+y_train = TDy.iloc[:4500]
+y_test = TDy.iloc[4500:]
+
+
+#Preparing data for testing
+UPx = UPdf.drop('Exercise Recommendation Plan', axis=1)
 
 
 
@@ -59,3 +71,27 @@ RFPercentCorrect = RFNumberCorrect/len(y_test)
 
 print("Random Forest Number Correct" , RFNumberCorrect)
 print("Random Forest Percentage Correct" , RFPercentCorrect)
+
+#Generating exercise plans
+
+DTOutputPlans = DTModel.predict(UPx)
+
+RFOutputPlans = RFModel.predict(UPx)
+
+DTOutputList = DTOutputPlans.tolist()
+
+RFOutputList = DTOutputPlans.tolist()
+
+print(DTOutputList)
+print(RFOutputList)
+
+with open('Data\\DTGeneratedPlans.csv', 'w', newline='') as DTFile:
+    DTWriter = csv.writer(DTFile)
+    DTWriter.writerow(DTOutputList)
+
+with open('Data\\RFGeneratedPlans.csv', 'w', newline='') as RFFile:
+    RFWriter = csv.writer(RFFile)
+    RFWriter.writerow(RFOutputList)
+
+
+
