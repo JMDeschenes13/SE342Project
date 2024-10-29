@@ -17,7 +17,7 @@ def generate_plan():
     bmi = request.form.get('bmi')
     bmi_case = request.form.get('bmiCase')
     
-    # Example response; you can replace this with actual logic to generate the workout plan
+    
     return f"Workout plan generated for {name} ({age} years, {gender}). Height: {height} cm, Weight: {weight} kg, Body Fat: {body_fat}%, BMI: {bmi} ({bmi_case})."
 
 if __name__ == "__main__":
