@@ -1,6 +1,9 @@
-from sklearn.model_selection import train_test_split
+
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
+from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
 import pandas as pd
 import csv
 
@@ -17,18 +20,26 @@ UPdf = pd.read_csv(userProfileDataPath)
 #Reading csv for training data
 TDdf = pd.read_csv(trainingDataFilePath)
 
+
+TDCleaneddf = TDdf.drop_duplicates()
+
+
+
 #Preparing Data for training
-TDx = TDdf.drop('Exercise Recommendation Plan', axis=1)
-TDy = TDdf['Exercise Recommendation Plan']
+TDx = TDCleaneddf.drop('Exercise Recommendation Plan', axis=1)
+TDy = TDCleaneddf['Exercise Recommendation Plan']
 
-x_train = TDx.iloc[:4500]
-x_test = TDx.iloc[4500:]
-
-y_train = TDy.iloc[:4500]
-y_test = TDy.iloc[4500:]
+# transform the dataset
+oversample = SMOTE()
+TDx, TDy = oversample.fit_resample(TDx, TDy)
 
 
-#Preparing data for testing
+
+x_train, x_test, y_train, y_test = train_test_split(TDx, TDy, test_size=.1, random_state=12)
+
+
+
+#Preparing data for creating plans
 UPx = UPdf.drop('Exercise Recommendation Plan', axis=1)
 
 
@@ -36,6 +47,11 @@ UPx = UPdf.drop('Exercise Recommendation Plan', axis=1)
 
 #Testing Decision Tree Model
 DTModel = DecisionTreeClassifier()
+
+
+# parameters for 89%
+#DTModel = DecisionTreeClassifier(criterion="gini", splitter="best", max_depth=7, min_samples_split=200)
+
 
 DTModel.fit(x_train, y_train)
 
@@ -72,26 +88,56 @@ RFPercentCorrect = RFNumberCorrect/len(y_test)
 print("Random Forest Number Correct" , RFNumberCorrect)
 print("Random Forest Percentage Correct" , RFPercentCorrect)
 
+
+
+GNBModel = GaussianNB(var_smoothing=0.000001)
+
+GNBModel.fit(x_train, y_train)
+
+GNBModelTestPredictions = GNBModel.predict(x_test)
+
+GNBNumberCorrect = 0
+for i in range(len(y_test)):
+    if GNBModelTestPredictions[i] == y_test.iloc[i]:
+        GNBNumberCorrect += 1
+
+GNBPercentCorrect = GNBNumberCorrect/len(y_test)
+
+print("Gaussian Naive Bayes Number Correct" , GNBNumberCorrect)
+print("Gaussian Naive Bayes Percentage Correct" , GNBPercentCorrect)
+
+
+
 #Generating exercise plans
 
 DTOutputPlans = DTModel.predict(UPx)
 
 RFOutputPlans = RFModel.predict(UPx)
 
+GNBOutputPlans = GNBModel.predict(UPx)
+
 DTOutputList = DTOutputPlans.tolist()
 
-RFOutputList = DTOutputPlans.tolist()
+RFOutputList = RFOutputPlans.tolist()
+
+GNBOutputList = GNBOutputPlans.tolist()
 
 print(DTOutputList)
 print(RFOutputList)
+print(GNBOutputList)
 
-with open('Data\\DTGeneratedPlans.csv', 'w', newline='') as DTFile:
+with open('Data\\DTGeneratedPlans1.csv', 'w', newline='') as DTFile:
     DTWriter = csv.writer(DTFile)
     DTWriter.writerow(DTOutputList)
 
-with open('Data\\RFGeneratedPlans.csv', 'w', newline='') as RFFile:
+with open('Data\\RFGeneratedPlans1.csv', 'w', newline='') as RFFile:
     RFWriter = csv.writer(RFFile)
     RFWriter.writerow(RFOutputList)
+
+with open('Data\\GNBGeneratedPlans1.csv', 'w', newline='') as GNBFile:
+    GNBWriter = csv.writer(GNBFile)
+    GNBWriter.writerow(GNBOutputList)
+
 
 
 
