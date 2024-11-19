@@ -4,6 +4,7 @@ from sklearn.ensemble import RandomForestClassifier
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
+from sklearn.linear_model import LogisticRegression
 import pandas as pd
 import csv
 
@@ -90,6 +91,7 @@ print("Random Forest Percentage Correct" , RFPercentCorrect)
 
 
 
+#Testing Gaussian Naive Bayes
 GNBModel = GaussianNB(var_smoothing=0.000001)
 
 GNBModel.fit(x_train, y_train)
@@ -107,6 +109,25 @@ print("Gaussian Naive Bayes Number Correct" , GNBNumberCorrect)
 print("Gaussian Naive Bayes Percentage Correct" , GNBPercentCorrect)
 
 
+#Testing Logistic Regression
+LRModel = LogisticRegression()
+
+LRModel.fit(x_train, y_train)
+
+LRModelTestPredictions = LRModel.predict(x_test)
+
+LRNumberCorrect = 0
+for i in range(len(y_test)):
+    if LRModelTestPredictions[i] == y_test.iloc[i]:
+        LRNumberCorrect += 1
+
+LRPercentCorrect = LRNumberCorrect/len(y_test)
+
+print("Logistic Regression Number Correct" , LRNumberCorrect)
+print("Logistic Regression Percentage Correct" , LRPercentCorrect)
+
+
+
 
 #Generating exercise plans
 
@@ -116,15 +137,20 @@ RFOutputPlans = RFModel.predict(UPx)
 
 GNBOutputPlans = GNBModel.predict(UPx)
 
+LROutputPlans = LRModel.predict(UPx)
+
 DTOutputList = DTOutputPlans.tolist()
 
 RFOutputList = RFOutputPlans.tolist()
 
 GNBOutputList = GNBOutputPlans.tolist()
 
+LROutputList = LROutputPlans.tolist()
+
 print(DTOutputList)
 print(RFOutputList)
 print(GNBOutputList)
+print(LROutputList)
 
 with open('Data\\DTGeneratedPlans1.csv', 'w', newline='') as DTFile:
     DTWriter = csv.writer(DTFile)
@@ -137,6 +163,10 @@ with open('Data\\RFGeneratedPlans1.csv', 'w', newline='') as RFFile:
 with open('Data\\GNBGeneratedPlans1.csv', 'w', newline='') as GNBFile:
     GNBWriter = csv.writer(GNBFile)
     GNBWriter.writerow(GNBOutputList)
+
+with open('Data\\LRGeneratedPlans1.csv', 'w', newline='') as LRFile:
+    LRWriter = csv.writer(LRFile)
+    LRWriter.writerow(LROutputList)
 
 
 
