@@ -5,6 +5,7 @@ from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import csv
 
@@ -110,18 +111,28 @@ print("Gaussian Naive Bayes Percentage Correct" , GNBPercentCorrect)
 
 
 #Testing Logistic Regression
-LRModel = LogisticRegression()
+scaler = StandardScaler()
 
-LRModel.fit(x_train, y_train)
+LRModel = LogisticRegression(max_iter=5000)
 
-LRModelTestPredictions = LRModel.predict(x_test)
+
+# Had to redo the data so I could scale it for the linear regression
+LRTDx = scaler.fit_transform(TDx, TDy)
+
+LRx_train, LRx_test, LRy_train, LRy_test = train_test_split(LRTDx,TDy, test_size=.1, random_state=12)
+
+
+
+LRModel.fit(LRx_train, LRy_train)
+
+LRModelTestPredictions = LRModel.predict(LRx_test)
 
 LRNumberCorrect = 0
-for i in range(len(y_test)):
-    if LRModelTestPredictions[i] == y_test.iloc[i]:
+for i in range(len(LRy_test)):
+    if LRModelTestPredictions[i] == LRy_test.iloc[i]:
         LRNumberCorrect += 1
 
-LRPercentCorrect = LRNumberCorrect/len(y_test)
+LRPercentCorrect = LRNumberCorrect/len(LRy_test)
 
 print("Logistic Regression Number Correct" , LRNumberCorrect)
 print("Logistic Regression Percentage Correct" , LRPercentCorrect)
@@ -137,7 +148,7 @@ RFOutputPlans = RFModel.predict(UPx)
 
 GNBOutputPlans = GNBModel.predict(UPx)
 
-LROutputPlans = LRModel.predict(UPx)
+LROutputPlans = LRModel.predict(UPx[:].values)
 
 DTOutputList = DTOutputPlans.tolist()
 
