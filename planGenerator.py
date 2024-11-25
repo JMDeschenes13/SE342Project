@@ -119,6 +119,8 @@ LRModel = LogisticRegression(max_iter=5000)
 # Had to redo the data so I could scale it for the linear regression
 LRTDx = scaler.fit_transform(TDx, TDy)
 
+LRUPx = scaler.fit_transform(UPx)
+
 LRx_train, LRx_test, LRy_train, LRy_test = train_test_split(LRTDx,TDy, test_size=.1, random_state=12)
 
 
@@ -148,36 +150,33 @@ RFOutputPlans = RFModel.predict(UPx)
 
 GNBOutputPlans = GNBModel.predict(UPx)
 
-LROutputPlans = LRModel.predict(UPx[:].values)
+LROutputPlans = LRModel.predict(LRUPx)
 
 DTOutputList = DTOutputPlans.tolist()
+DTOutputList.insert(0, "DT Plans")
 
 RFOutputList = RFOutputPlans.tolist()
+RFOutputList.insert(0, "RF Plans")
 
 GNBOutputList = GNBOutputPlans.tolist()
+GNBOutputList.insert(0, "GNB Plans")
 
 LROutputList = LROutputPlans.tolist()
+LROutputList.insert(0, "LR Plans")
 
 print(DTOutputList)
 print(RFOutputList)
 print(GNBOutputList)
 print(LROutputList)
 
-with open('Data\\DTGeneratedPlans1.csv', 'w', newline='') as DTFile:
-    DTWriter = csv.writer(DTFile)
-    DTWriter.writerow(DTOutputList)
+with open('Data\\AIGeneratedPlans.csv', 'w', newline='') as AIFile:
+    AIWriter = csv.writer(AIFile)
+    AIWriter.writerow(DTOutputList)
+    AIWriter.writerow(RFOutputList)
+    AIWriter.writerow(GNBOutputList)
+    AIWriter.writerow(LROutputList)
 
-with open('Data\\RFGeneratedPlans1.csv', 'w', newline='') as RFFile:
-    RFWriter = csv.writer(RFFile)
-    RFWriter.writerow(RFOutputList)
 
-with open('Data\\GNBGeneratedPlans1.csv', 'w', newline='') as GNBFile:
-    GNBWriter = csv.writer(GNBFile)
-    GNBWriter.writerow(GNBOutputList)
-
-with open('Data\\LRGeneratedPlans1.csv', 'w', newline='') as LRFile:
-    LRWriter = csv.writer(LRFile)
-    LRWriter.writerow(LROutputList)
 
 
 
