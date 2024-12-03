@@ -169,7 +169,7 @@ print(RFOutputList)
 print(GNBOutputList)
 print(LROutputList)
 
-with open('Data\\AIGeneratedPlans.csv', 'w', newline='') as AIFile:
+with open('Data\\AIGeneratedPlans1.csv', 'w', newline='') as AIFile:
     AIWriter = csv.writer(AIFile)
     AIWriter.writerow(DTOutputList)
     AIWriter.writerow(RFOutputList)
